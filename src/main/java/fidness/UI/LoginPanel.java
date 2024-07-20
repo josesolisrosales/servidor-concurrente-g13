@@ -147,4 +147,8 @@ public class LoginPanel extends JPanel {
         JOptionPane.showMessageDialog(this, message, "Exito", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public void resetFields() {
+        usernameField.setText("");
+        passwordField.setText("");
+    }
 }

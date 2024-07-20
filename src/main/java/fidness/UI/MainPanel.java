@@ -1,5 +1,7 @@
 package fidness.UI;
 
+import fidness.Exercise;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -8,6 +10,7 @@ public class MainPanel extends JPanel {
     private JPanel contentPanel;
     private CustomSidebar sidebar;
     private CardLayout contentLayout;
+    private ExercisePanel exercisePanel;
 
     public MainPanel(App app) {
         this.app = app;
@@ -25,6 +28,7 @@ public class MainPanel extends JPanel {
         add(sidebar, BorderLayout.WEST);
         add(contentPanel, BorderLayout.CENTER);
 
+        sidebar.addButton("Inicio", this::showWelcome);
         sidebar.addButton("Perfil", this::showProfile);
         sidebar.addButton("Ejercicios", this::showExercises);
         sidebar.addButton("Rutinas", this::showRoutines);
@@ -35,22 +39,28 @@ public class MainPanel extends JPanel {
 
         sidebar.addButton("Cerrar Sesión", this::logout);
 
-        contentPanel.add(new JPanel(), "PERFIL");
-        contentPanel.add(new JPanel(), "EJERCICIOS");
+        contentPanel.add(new WelcomePanel(app), "INICIO");
+        contentPanel.add(new ProfilePanel(app), "PERFIL");
+        exercisePanel = new ExercisePanel(app, this);
+        contentPanel.add(exercisePanel, "EJERCICIOS");
         contentPanel.add(new JPanel(), "RUTINAS");
 
         if (app.getCurrentUser().isAdmin()) {
             contentPanel.add(new UserManagementPanel(app), "MANEJO DE USUARIOS");
         }
 
-        showProfile();
+        showWelcome();
+    }
+
+    private void showWelcome() {
+        contentLayout.show(contentPanel, "INICIO");
     }
 
     private void showProfile() {
         contentLayout.show(contentPanel, "PERFIL");
     }
 
-    private void showExercises() {
+    public void showExercises() {
         contentLayout.show(contentPanel, "EJERCICIOS");
     }
 
@@ -60,6 +70,12 @@ public class MainPanel extends JPanel {
 
     private void showUserManagement() {
         contentLayout.show(contentPanel, "MANEJO DE USUARIOS");
+    }
+
+    public void showExerciseDetail(Exercise exercise) {
+        ExerciseDetailPanel detailPanel = new ExerciseDetailPanel(app, exercise, this);
+        contentPanel.add(detailPanel, "EXERCISE_DETAIL");
+        contentLayout.show(contentPanel, "EXERCISE_DETAIL");
     }
 
     private void logout() {

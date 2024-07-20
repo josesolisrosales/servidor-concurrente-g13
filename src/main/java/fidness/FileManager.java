@@ -7,6 +7,7 @@ import java.util.List;
 // Clase para manejar la lectura y escritura de archivos para persistir los objetos creados.
 public class FileManager {
     private static final String USER_FILE="users.dat";
+    private static final String EXERCISE_FILE="exercises.dat";
 
     // Guarda la lista de usuarios en un archivo
     public static void saveUsers(List<User> users){
@@ -33,5 +34,26 @@ public class FileManager {
             }
         }
         return users;
+    }
+
+    public static void saveExercises(List<Exercise> exercises) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(EXERCISE_FILE))) {
+            oos.writeObject(exercises);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static List<Exercise> loadExercises() {
+        List<Exercise> exercises = new ArrayList<>();
+        File file = new File(EXERCISE_FILE);
+        if (file.exists()) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(EXERCISE_FILE))) {
+                exercises = (List<Exercise>) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return exercises;
     }
 }
