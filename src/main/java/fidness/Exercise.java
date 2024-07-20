@@ -1,12 +1,17 @@
 package fidness;
 
-public class Excercise {
+import java.io.Serializable;
+
+public class Exercise implements Serializable {
+    // Serializamos la clase para poder guardarla en un archivo
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String description;
     private String videoUrl;
     private String muscleGroup;
 
-    public Excercise(String name, String description, String videoUrl, String muscleGroup) {
+    public Exercise(String name, String description, String videoUrl, String muscleGroup) {
         this.name = name;
         this.description = description;
         this.videoUrl = videoUrl;

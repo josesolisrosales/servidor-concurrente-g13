@@ -1,16 +1,20 @@
 package fidness;
 
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class Routine {
+public class Routine implements  Serializable {
+    // Serializamos la clase para poder guardarla en un archivo
+    private static final long serialVersionUID = 1L;
+
     private String name;
     private String description;
-    private ArrayList<Excercise> excercises;
+    private ArrayList<Exercise> exercises;
 
     public Routine(String name, String description) {
         this.name = name;
         this.description = description;
-        this.excercises = new ArrayList<Excercise>();
+        this.exercises = new ArrayList<Exercise>();
     }
 
     public String getName() {
@@ -27,14 +31,14 @@ public class Routine {
         this.description = description;
     }
 
-    public ArrayList<Excercise> getExcercises() {
-        return excercises;
+    public ArrayList<Exercise> getExcercises() {
+        return exercises;
     }
-    public void addExcercise(Excercise excercise) {
-        this.excercises.add(excercise);
+    public void addExcercise(Exercise exercise) {
+        this.exercises.add(exercise);
     }
-    public void removeExcercise(Excercise excercise) {
-        this.excercises.remove(excercise);
+    public void removeExcercise(Exercise exercise) {
+        this.exercises.remove(exercise);
     }
 
 }

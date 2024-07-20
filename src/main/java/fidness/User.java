@@ -1,8 +1,11 @@
 package fidness;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class User {
+public class User implements Serializable {
+    // Serializamos la clase para poder guardarla en un archivo
+    private static final long serialVersionUID = 1L;
+
     private String username;
     private String name;
     private String lastName;
@@ -73,7 +76,4 @@ public class User {
         isAdmin = admin;
     }
 
-    public boolean signIn(String username, String password) {
-        return this.username.equals(username) && this.password.equals(password);
-    }
 }
