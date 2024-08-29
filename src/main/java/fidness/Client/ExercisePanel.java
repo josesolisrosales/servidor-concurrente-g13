@@ -1,6 +1,7 @@
-package fidness.UI;
+package fidness.Client;
 
-import fidness.Exercise;
+import fidness.Client.Utility.Client;
+import fidness.Objects.Exercise;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -91,11 +92,11 @@ public class ExercisePanel extends JPanel {
 
         addExerciseButton = new JButton("Agregar Ejercicio");
         addExerciseButton.addActionListener(e -> showAddExerciseDialog());
-        addExerciseButton.setVisible(app.getCurrentUser().isAdmin());
+        addExerciseButton.setVisible(Client.getInstance().getCurrentUser().isAdmin());
 
         deleteExercisesButton = new JButton("Eliminar Seleccionados");
         deleteExercisesButton.addActionListener(e -> deleteSelectedExercises());
-        deleteExercisesButton.setVisible(app.getCurrentUser().isAdmin());
+        deleteExercisesButton.setVisible(Client.getInstance().getCurrentUser().isAdmin());
 
         addToRoutineButton = new JButton("Añadir a Rutina");
         addToRoutineButton.addActionListener(e -> addSelectedToRoutine());
@@ -109,14 +110,14 @@ public class ExercisePanel extends JPanel {
         add(controlPanel, BorderLayout.NORTH);
     }
 
-    private void refreshExerciseList() {
+    void refreshExerciseList() {
         tableModel.setRowCount(0);
         String selectedMuscleGroup = (String) muscleGroupFilter.getSelectedItem();
 
         if (selectedMuscleGroup.equals("Todos")) {
-            displayedExercises = app.getExerciseManager().getAllExercises();
+            displayedExercises = Client.getInstance().getExercises();
         } else {
-            displayedExercises = app.getExerciseManager().getExercisesByMuscleGroup(selectedMuscleGroup);
+            displayedExercises = Client.getInstance().getExercisesByMuscleGroup(selectedMuscleGroup);
         }
 
         for (Exercise exercise : displayedExercises) {
@@ -129,7 +130,7 @@ public class ExercisePanel extends JPanel {
     }
 
     private void showAddExerciseDialog() {
-        if (!app.getCurrentUser().isAdmin()) {
+        if (!Client.getInstance().getCurrentUser().isAdmin()) {
             JOptionPane.showMessageDialog(this, "Solo los administradores pueden agregar ejercicios.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -152,14 +153,18 @@ public class ExercisePanel extends JPanel {
         int result = JOptionPane.showConfirmDialog(null, panel, "Agregar Ejercicio", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            app.getExerciseManager().addExercise(
+            boolean success = Client.getInstance().createExercise(
                     nameField.getText(),
+                    (String) muscleGroupCombo.getSelectedItem(),
                     descriptionField.getText(),
-                    videoUrlField.getText(),
-                    (String) muscleGroupCombo.getSelectedItem()
+                    videoUrlField.getText()
             );
-            refreshExerciseList();
-            JOptionPane.showMessageDialog(this, "Ejercicio agregado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            if (success) {
+                refreshExerciseList();
+                JOptionPane.showMessageDialog(this, "Ejercicio agregado exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Error al agregar el ejercicio", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -168,7 +173,7 @@ public class ExercisePanel extends JPanel {
     }
 
     private void deleteSelectedExercises() {
-        if (!app.getCurrentUser().isAdmin()) {
+        if (!Client.getInstance().getCurrentUser().isAdmin()) {
             JOptionPane.showMessageDialog(this, "Solo los administradores pueden eliminar ejercicios.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -191,11 +196,20 @@ public class ExercisePanel extends JPanel {
                 JOptionPane.YES_NO_OPTION);
 
         if (confirm == JOptionPane.YES_OPTION) {
+            boolean allDeleted = true;
             for (Exercise exercise : exercisesToDelete) {
-                app.getExerciseManager().deleteExercise(exercise);
+                boolean success = Client.getInstance().deleteExercise(exercise.getName());
+                if (!success) {
+                    allDeleted = false;
+                    break;
+                }
             }
             refreshExerciseList();
-            JOptionPane.showMessageDialog(this, "Ejercicios eliminados exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            if (allDeleted) {
+                JOptionPane.showMessageDialog(this, "Ejercicios eliminados exitosamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Hubo un error al eliminar algunos ejercicios", "Error", JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -212,7 +226,6 @@ public class ExercisePanel extends JPanel {
             return;
         }
 
-        // Placeholder for adding to routine functionality
         JOptionPane.showMessageDialog(this, "Funcionalidad de añadir a rutina aún no implementada.", "Aviso", JOptionPane.INFORMATION_MESSAGE);
     }
 }

@@ -1,8 +1,10 @@
-package fidness;
+package fidness.Objects;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
 public class User implements Serializable {
+
     // Serializamos la clase para poder guardarla en un archivo
     private static final long serialVersionUID = 1L;
 
@@ -22,6 +24,19 @@ public class User implements Serializable {
         this.email = email;
         this.isAdmin = isAdmin;
         this.routines = new ArrayList<Routine>();
+    }
+
+    public User(String username, boolean isAdmin) {
+        this.username = username;
+        this.isAdmin = isAdmin;
+    }
+
+
+    public User(String username, String name, String lastname, String email) {
+        this.username = username;
+        this.name = name;
+        this.lastName = lastname;
+        this.email = email;
     }
 
     public void setUsername(String username) {
@@ -61,12 +76,6 @@ public class User implements Serializable {
 
     public ArrayList<Routine> getRoutines() {
         return routines;
-    }
-    public void addRoutine(Routine routine) {
-        this.routines.add(routine);
-    }
-    public void removeRoutine(Routine routine) {
-        this.routines.remove(routine);
     }
 
     public boolean isAdmin() {

@@ -1,4 +1,4 @@
-package fidness.UI;
+package fidness.Client;
 
 import javax.swing.*;
 import java.awt.*;
@@ -38,6 +38,14 @@ public class CustomSidebar extends JPanel {
         buttons.add(button);
         add(button);
         add(Box.createVerticalStrut(5));
+    }
+
+    public void removeAll() {
+        super.removeAll();
+        buttons.clear();
+        add(Box.createVerticalStrut(10));
+        add(toggleButton);
+        add(Box.createVerticalStrut(10));
     }
 
     private void toggleSidebar() {

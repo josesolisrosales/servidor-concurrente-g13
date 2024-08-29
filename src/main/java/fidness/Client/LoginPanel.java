@@ -1,6 +1,7 @@
-package fidness.UI;
+package fidness.Client;
 
-import fidness.User;
+import fidness.Client.Utility.Client;
+import fidness.Objects.User;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,7 +35,7 @@ public class LoginPanel extends JPanel {
 
         KeyAdapter enterKeyListener = new KeyAdapter() {
             @Override
-            public void keyReleased(java.awt.event.KeyEvent e) {
+            public void keyReleased(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     login();
                 }
@@ -57,7 +58,7 @@ public class LoginPanel extends JPanel {
 
         gbc.gridx = 1;
         gbc.gridy = 0;
-        usernameField = new JTextField();
+        usernameField = new JTextField(15);
         panel.add(usernameField, gbc);
 
         gbc.gridx = 0;
@@ -74,7 +75,7 @@ public class LoginPanel extends JPanel {
 
     private JPanel createButtonPanel() {
         JPanel panel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        loginButton = new JButton("Login");
+        loginButton = new JButton("Iniciar sesión");
         registerButton = new JButton("Registrarse");
 
         loginButton.addActionListener(e -> login());
@@ -86,16 +87,20 @@ public class LoginPanel extends JPanel {
     }
 
     private void login() {
-        String username = usernameField.getText();
+        String username = usernameField.getText().trim();
         String password = new String(passwordField.getPassword());
 
-        User user = app.getUserManager().authenticateUser(username, password);
+        if (username.isEmpty() || password.isEmpty()) {
+            showError("Por favor, ingrese usuario y contraseña.");
+            return;
+        }
 
-        if (user != null) {
-            app.setCurrentUser(user);
-            app.showMainPanel();
+        if (Client.getInstance().authenticateUser(username, password)) {
+            User user = Client.getInstance().getUserByUsername(Client.getInstance().getCurrentUser().getUsername());
+            Client.getInstance().setCurrentUser(user);
+            app.loginSuccessful();
         } else {
-            showError("Nombre de usuario o contraseña incorrectos");
+            showError("Usuario no existe o contraseña incorrecta.");
         }
     }
 
@@ -105,6 +110,7 @@ public class LoginPanel extends JPanel {
         JTextField lastNameField = new JTextField(15);
         JTextField emailField = new JTextField(15);
         JPasswordField passwordField = new JPasswordField(15);
+        JPasswordField confirmPasswordField = new JPasswordField(15);
 
         JPanel panel = new JPanel(new GridLayout(0, 1));
         panel.add(new JLabel("Usuario:"));
@@ -117,24 +123,33 @@ public class LoginPanel extends JPanel {
         panel.add(emailField);
         panel.add(new JLabel("Contraseña:"));
         panel.add(passwordField);
+        panel.add(new JLabel("Confirmar Contraseña:"));
+        panel.add(confirmPasswordField);
 
         int result = JOptionPane.showConfirmDialog(null, panel, "Registrarse", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
 
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                User newUser = app.getUserManager().createUser(
-                        usernameField.getText(),
-                        nameField.getText(),
-                        lastNameField.getText(),
-                        new String(passwordField.getPassword()),
-                        emailField.getText(),
-                        false
-                );
-                showMessage("Usuario creado con éxito");
-                app.setCurrentUser(newUser);
-                app.showMainPanel();
-            } catch (IllegalArgumentException e) {
-                showError(e.getMessage());
+            String username = usernameField.getText().trim();
+            String name = nameField.getText().trim();
+            String lastName = lastNameField.getText().trim();
+            String email = emailField.getText().trim();
+            String password = new String(passwordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
+
+            if (username.isEmpty() || name.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                showError("Todos los campos son obligatorios.");
+                return;
+            }
+
+            if (!password.equals(confirmPassword)) {
+                showError("Las contraseñas no coinciden.");
+                return;
+            }
+
+            if (Client.getInstance().registerUser(username, name, lastName, password, email, false)) {
+                showMessage("Usuario creado con éxito, ingrese con sus credenciales para continuar.");
+            } else {
+                showError("Error al crear usuario: Nombre de usuario ya existe.");
             }
         }
     }
@@ -144,7 +159,7 @@ public class LoginPanel extends JPanel {
     }
 
     private void showMessage(String message) {
-        JOptionPane.showMessageDialog(this, message, "Exito", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void resetFields() {

@@ -1,4 +1,4 @@
-package fidness;
+package fidness.Objects;
 
 import java.io.Serializable;
 
@@ -45,5 +45,10 @@ public class Exercise implements Serializable {
     }
     public void setMuscleGroup(String muscleGroup) {
         this.muscleGroup = muscleGroup;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
