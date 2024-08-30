@@ -1,7 +1,7 @@
 ----------------------------------------------------------------
-Thu Aug 29 14:39:25 CDT 2024:
-Booting Derby version The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instance a816c00e-0191-9fa6-5d41-000007984c40 
-on database directory /Users/josesolisrosales/Development/servidor-concurrente-g13/FidnessDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@1cf4f579 
+Fri Aug 30 11:38:30 CDT 2024:
+Booting Derby version The Apache Software Foundation - Apache Derby - 10.17.1.0 - (1913217): instance a816c00e-0191-a427-12f6-000007875d10 
+on database directory /Users/josesolisrosales/Development/servidor-concurrente-g13/FidnessDB with class loader jdk.internal.loader.ClassLoaders$AppClassLoader@4e0e2f2a 
 Loaded from file:/Users/josesolisrosales/.m2/repository/org/apache/derby/derby/10.17.1.0/derby-10.17.1.0.jar
 java.vendor=Oracle Corporation
 java.runtime.version=21.0.4+8-LTS-274

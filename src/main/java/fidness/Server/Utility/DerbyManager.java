@@ -17,11 +17,6 @@ public class DerbyManager {
     private static DerbyManager instance;
 
     private DerbyManager() {
-        try {
-            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
         initializeDatabase();
     }
 
@@ -53,7 +48,9 @@ public class DerbyManager {
                     "email VARCHAR(50), " +
                     "isAdmin BOOLEAN)";
             try (Statement stmt = conn.createStatement()) {
+                System.out.println("Executing SQL: " + sql);
                 stmt.execute(sql);
+                System.out.println("Tabla de usuarios no encontrada, creando...");
             }
         }
     }
@@ -66,7 +63,9 @@ public class DerbyManager {
                     "videoUrl VARCHAR(255), " +
                     "muscleGroup VARCHAR(50))";
             try (Statement stmt = conn.createStatement()) {
+                System.out.println("Executing SQL: " + sql);
                 stmt.execute(sql);
+                System.out.println("Tabla de ejercicios no encontrada, creando...");
             }
         }
     }
@@ -80,7 +79,9 @@ public class DerbyManager {
                     "username VARCHAR(50), " +
                     "FOREIGN KEY (username) REFERENCES " + USER_TABLE + "(username))";
             try (Statement stmt = conn.createStatement()) {
+                System.out.println("Executing SQL: " + sql);
                 stmt.execute(sql);
+                System.out.println("Tabla de rutinas no encontrada, creando...");
             }
         }
     }
@@ -94,7 +95,9 @@ public class DerbyManager {
                     "FOREIGN KEY (routineId) REFERENCES " + ROUTINE_TABLE + "(id), " +
                     "FOREIGN KEY (exerciseName) REFERENCES " + EXERCISE_TABLE + "(name))";
             try (Statement stmt = conn.createStatement()) {
+                System.out.println("Executing SQL: " + sql);
                 stmt.execute(sql);
+                System.out.println("Tabla de ejercicios de rutinas no encontrada, creando...");
             }
         }
     }
@@ -108,9 +111,11 @@ public class DerbyManager {
     // Métodos para User
     public List<User> selectFromUsers(String query) {
         List<User> users = new ArrayList<>();
+        String sql = "SELECT * FROM " + USER_TABLE + " WHERE " + query;
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM " + USER_TABLE + " WHERE " + query)) {
+             ResultSet rs = stmt.executeQuery(sql)) {
+            System.out.println("Executing SQL: " + sql);
             while (rs.next()) {
                 users.add(new User(
                         rs.getString("username"),
@@ -124,6 +129,7 @@ public class DerbyManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        System.out.println("Ejecutando SELECT en tabla " + USER_TABLE + " con argumento: " + query);
         return users;
     }
 
@@ -135,6 +141,7 @@ public class DerbyManager {
         String sql = "INSERT INTO " + USER_TABLE + " (username, name, lastName, password, email, isAdmin) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, user.getUsername());
             pstmt.setString(2, user.getName());
             pstmt.setString(3, user.getLastName());
@@ -152,6 +159,7 @@ public class DerbyManager {
         String sql = "UPDATE " + USER_TABLE + " SET name = ?, lastName = ?, password = ?, email = ?, isAdmin = ? WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, user.getName());
             pstmt.setString(2, user.getLastName());
             pstmt.setString(3, user.getPassword());
@@ -169,6 +177,7 @@ public class DerbyManager {
         String sql = "DELETE FROM " + USER_TABLE + " WHERE username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, username);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -180,9 +189,11 @@ public class DerbyManager {
     // Métodos para Exercise
     public List<Exercise> selectFromExercises(String query) {
         List<Exercise> exercises = new ArrayList<>();
+        String sql = "SELECT * FROM " + EXERCISE_TABLE + " WHERE " + query;
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM " + EXERCISE_TABLE + " WHERE " + query)) {
+             ResultSet rs = stmt.executeQuery(sql)) {
+            System.out.println("Executing SQL: " + sql);
             while (rs.next()) {
                 exercises.add(new Exercise(
                         rs.getString("name"),
@@ -205,6 +216,7 @@ public class DerbyManager {
         String sql = "INSERT INTO " + EXERCISE_TABLE + " (name, description, videoUrl, muscleGroup) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, exercise.getName());
             pstmt.setString(2, exercise.getDescription());
             pstmt.setString(3, exercise.getVideoUrl());
@@ -220,6 +232,7 @@ public class DerbyManager {
         String sql = "UPDATE " + EXERCISE_TABLE + " SET description = ?, videoUrl = ?, muscleGroup = ? WHERE name = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, exercise.getDescription());
             pstmt.setString(2, exercise.getVideoUrl());
             pstmt.setString(3, exercise.getMuscleGroup());
@@ -235,6 +248,7 @@ public class DerbyManager {
         String sql = "DELETE FROM " + EXERCISE_TABLE + " WHERE name = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, name);
             return pstmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -246,9 +260,11 @@ public class DerbyManager {
     // Métodos para Routine
     public List<Routine> selectFromRoutines(String query) {
         List<Routine> routines = new ArrayList<>();
+        String sql = "SELECT * FROM " + ROUTINE_TABLE + " WHERE " + query;
         try (Connection conn = DriverManager.getConnection(DB_URL);
              Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery("SELECT * FROM " + ROUTINE_TABLE + " WHERE " + query)) {
+             ResultSet rs = stmt.executeQuery(sql)) {
+            System.out.println("Executing SQL: " + sql);
             while (rs.next()) {
                 Routine routine = new Routine(
                         rs.getInt("id"),
@@ -268,6 +284,7 @@ public class DerbyManager {
     private void loadRoutineExercises(Connection conn, Routine routine) throws SQLException {
         String sql = "SELECT e.* FROM " + EXERCISE_TABLE + " e JOIN " + ROUTINE_EXERCISE_TABLE + " re ON e.name = re.exerciseName WHERE re.routineId = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setInt(1, routine.getId());
             ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
@@ -285,6 +302,7 @@ public class DerbyManager {
         String sql = "INSERT INTO " + ROUTINE_TABLE + " (name, description, username) VALUES (?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, routine.getName());
             pstmt.setString(2, routine.getDescription());
             pstmt.setString(3, username);
@@ -312,6 +330,7 @@ public class DerbyManager {
     private void insertRoutineExercises(Connection conn, Routine routine) throws SQLException {
         String sql = "INSERT INTO " + ROUTINE_EXERCISE_TABLE + " (routineId, exerciseName) VALUES (?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             for (Exercise exercise : routine.getExcercises()) {
                 pstmt.setInt(1, routine.getId());
                 pstmt.setString(2, exercise.getName());
@@ -325,6 +344,7 @@ public class DerbyManager {
         String sql = "UPDATE " + ROUTINE_TABLE + " SET name = ?, description = ? WHERE id = ? AND username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, routine.getName());
             pstmt.setString(2, routine.getDescription());
             pstmt.setInt(3, routine.getId());
@@ -348,6 +368,7 @@ public class DerbyManager {
     private void deleteRoutineExercises(Connection conn, int routineId) throws SQLException {
         String sql = "DELETE FROM " + ROUTINE_EXERCISE_TABLE + " WHERE routineId = ?";
         try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setInt(1, routineId);
             pstmt.executeUpdate();
         }
@@ -357,6 +378,7 @@ public class DerbyManager {
         String sql = "DELETE FROM " + ROUTINE_TABLE + " WHERE name = ? AND username = ?";
         try (Connection conn = DriverManager.getConnection(DB_URL);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            System.out.println("Executing SQL: " + sql);
             pstmt.setString(1, name);
             pstmt.setString(2, username);
             return pstmt.executeUpdate() > 0;
